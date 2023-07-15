@@ -1,0 +1,23 @@
+{
+  "name": "dronecontrol",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "express-ws": "^5.0.2",
+    "gltf-loader": "^1.0.0",
+    "node-hid": "^2.1.2",
+    "three": "^0.154.0",
+    "three-gltf-loader": "^1.111.0",
+    "usb": "^2.9.0",
+    "ws": "^8.13.0"
+  },
+  "description": ""
+}
