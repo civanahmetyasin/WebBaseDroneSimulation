@@ -18,7 +18,7 @@ app.ws('/', function(ws, req) {
         var yaw = data.readInt8(5)
         var throttle = data.readInt8(2)
         console.log(roll, pitch, yaw, throttle)
-        //console.log(data)
+        // console.log(data)
 
         ws.send(JSON.stringify({ roll: roll, pitch: pitch, yaw: yaw, throttle: throttle }))
       })

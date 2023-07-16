@@ -22,18 +22,51 @@ scene.add(drone);
 
 camera.position.z = 5;
 
+var controlSignal = 0;
+var controlSignalx = 0;
+var controlSignalz = 0;
+
 ws.onmessage =
     function(event) {
   var data = JSON.parse(event.data);
   var roll = scale(data.roll, -127, 127, -Math.PI, Math.PI);
+  var signalx = scale(data.roll, -127, 127, -3, 3);
   var pitch = scale(data.pitch, -127, 127, -Math.PI, Math.PI);
+  var signalz = scale(data.pitch, -127, 127, -3, 3);
   var yaw = scale(data.yaw, -127, 127, -Math.PI, Math.PI);
-  var throttle = scale(data.throttle, -127, 127, -6, 32);
+  desiredAltitude = scale(data.throttle, -127, 127, -3, 3);
+
+  if (desiredAltitude <= 0) {
+    desiredAltitude += 3;
+  } else {
+    desiredAltitude -= 3;
+  }
+
+  if (signalx <= 0) {
+    signalx += 3;
+  } else {
+    signalx -= 3;
+  }
+
+  if (signalz <= 0) {
+    signalz += 3;
+  } else {
+    signalz -= 3;
+  }
+
+
+  controlSignal += desiredAltitude * 0.1;
+
+  controlSignalx += signalx * -0.1;
+  controlSignalz += signalz * -0.1;
 
   drone.rotation.x = pitch;
   drone.rotation.y = yaw;
   drone.rotation.z = roll * -1;
-  drone.position.y = throttle * -1;
+
+  drone.position.y = controlSignal * -1;
+  drone.position.x = controlSignalx * -1;
+  drone.position.z = controlSignalz * -1;
 }
 
 
