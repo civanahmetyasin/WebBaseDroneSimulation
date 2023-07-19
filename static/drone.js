@@ -25,7 +25,7 @@ loader.load(
     '/models/Drone.glb',
     function(gltf) {
       drone = gltf.scene;
-      drone.position.y = 5;
+      drone.position.y = 0;
       drone.position.x = 0;
       drone.position.z = 0;
       drone.scale.set(5,5,5);
@@ -125,6 +125,11 @@ function updateInfo() {
 }
 
 var cameraoffset = new THREE.Vector3(10, 10, 10);
+
+var gasInput = document.getElementById('gas-input');
+gasInput.addEventListener('input', function() {
+  drone.position.z = parseFloat(this.value);
+});
 
 var animate = function() {
   requestAnimationFrame(animate);
