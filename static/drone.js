@@ -11,6 +11,7 @@ var ws = new WebSocket('ws://localhost:8080');
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(
     75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(5, 5, 5);
 var renderer = new THREE.WebGLRenderer();
 
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -24,7 +25,7 @@ loader.load(
     '/models/Drone.glb',
     function(gltf) {
       drone = gltf.scene;
-      drone.position.y = 0;
+      drone.position.y = 5;
       drone.position.x = 0;
       drone.position.z = 0;
       drone.scale.set(5,5,5);
@@ -38,6 +39,16 @@ loader.load(
 
 var light = new THREE.AmbientLight(0xffffff, 5);
 scene.add(light);
+
+scene.background = new THREE.Color(0xffffff);
+scene.add(new THREE.GridHelper(1000, 100, 0x000000, 0x000000));
+scene.add(new THREE.AxesHelper(1000));
+scene.fog = new THREE.Fog(0xffffff, 10, 100);
+
+var controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 0, 0);
+controls.update();
+
 
 
 
@@ -113,8 +124,12 @@ function updateInfo() {
                                          + drone.position.z.toFixed(2) + ')';
 }
 
+var cameraoffset = new THREE.Vector3(10, 10, 10);
+
 var animate = function() {
   requestAnimationFrame(animate);
+  camera.lookAt(drone.position);
+  camera.position.copy(drone.position).add(cameraoffset);
   renderer.render(scene, camera);
   updateInfo();
 };
