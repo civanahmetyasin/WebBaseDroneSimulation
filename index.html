@@ -3,11 +3,33 @@
 <head>
   <title>My first three.js app</title>
   <style>
-    body { margin: 0; }
-    canvas { display: block; }
+  body { 
+    margin: 0; 
+    background-color: #282C34; /* Change this to any color you want as your page background */
+    font-family: Arial, sans-serif; /* Using a common sans-serif font */
+    color: #FFF; /* This makes the font color white, you can choose any color you prefer */
+  }
+
+  #info {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 15px; /* Adds some padding around the text */
+    color: #A40808; /* This color code is for a dark red, you can change as you see fit */
+    background-color: #1D1D24; /* A darker shade of grey used here, change as per your liking */
+    border-radius: 10px; /* Rounds the corners of the element */
+    font-size: 1.1em; /* Increases the size of the font a little */
+    z-index: 1;
+    border: 2px dashed #A40808; /* Makes the border dashed and colored the same as the text */
+  }
+    
   </style>
 </head>
 <body>
+  <div id="info">
+    <p id="speed">Speed: 0</p>
+    <p id="position">Position: (0, 0, 0)</p>
+  </div>
   <script src="https://threejs.org/build/three.js"></script>
   <script type="module" src="drone.js"></script>
 </body>
