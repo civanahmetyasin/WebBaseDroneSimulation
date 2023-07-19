@@ -5,54 +5,77 @@
   <style>
   body { 
     margin: 0; 
-    background-color: #282C34; /* Change this to any color you want as your page background */
-    font-family: Arial, sans-serif; /* Using a common sans-serif font */
-    color: #FFF; /* This makes the font color white, you can choose any color you prefer */
+    background-color: #282C34;
+    font-family: Arial, sans-serif; 
+    color: #FFF; 
   }
 
   #info {
     position: absolute;
     top: 10px;
     left: 10px;
-    padding: 15px; /* Adds some padding around the text */
-    color: #A40808; /* This color code is for a dark red, you can change as you see fit */
-    background-color: #1D1D24; /* A darker shade of grey used here, change as per your liking */
-    border-radius: 10px; /* Rounds the corners of the element */
-    font-size: 1.1em; /* Increases the size of the font a little */
+    padding: 15px; 
+    color: #A40808;
+    background-color: #1D1D24; 
+    border-radius: 10px; 
+    font-size: 1.1em;
     z-index: 1;
-    border: 2px dashed #A40808; /* Makes the border dashed and colored the same as the text */
+    border: 2px dashed #A40808;
   }
-  #gas-panel {
+
+  #control-panel {
     position: fixed;
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .panel {
     padding: 10px;
     background: rgba(29, 29, 36, 0.8);
     border-radius: 30px;
     display: flex;
     align-items: center;
     gap: 10px;
-    border: 2px solid #A40808; 
+    border: 2px solid #A40808;
   }
-
 
   #gas-panel input[type="range"] {
     flex-grow: 1;
     margin: 0 10px;
+    width: 200px; /* increase or decrease as needed */
   }
-    
+
+  #altitude-panel input[type="range"] {
+    writing-mode: bt-lr; /* IE */
+    -webkit-appearance: slider-vertical; /* WebKit */
+    width: 8px;
+    height: 150px; /* increase or decrease as needed */
+    padding: 0 10px;
+  }
   </style>
 </head>
 <body>
   <div id="info">
     <p id="speed">Speed: 0</p>
     <p id="position">Position: (0, 0, 0)</p>
-    <div id="gas-panel">
+  </div>
+
+  <div id="control-panel">
+    <div id="gas-panel" class="panel">
       <label for="gas-input">Gas: </label>
       <input id="gas-input" type="range" min="0" max="100" step="0.1" value="0">
     </div>
+
+    <div id="altitude-panel" class="panel">
+      <label for="altitude-input">Altitude: </label>
+      <input id="altitude-input" type="range" min="0" max="100" step="0.1" value="0" orient="vertical">
+    </div>
   </div>
+
   <script src="https://threejs.org/build/three.js"></script>
   <script type="module" src="drone.js"></script>
 </body>
