@@ -11,7 +11,6 @@ var ws = new WebSocket('ws://localhost:8080');
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(
     75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(5, 5, 5);
 var renderer = new THREE.WebGLRenderer();
 
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -125,16 +124,32 @@ function updateInfo() {
 }
 
 var cameraoffset = new THREE.Vector3(10, 10, 10);
+var cameraLerpFactor = 0.05; // control the speed of interpolation (0.05 is a good starting value)
+
 
 var gasInput = document.getElementById('gas-input');
 gasInput.addEventListener('input', function() {
   drone.position.z = parseFloat(this.value);
 });
 
+// Adding altitude control
+var altitudeInput = document.getElementById('altitude-input');
+altitudeInput.addEventListener('input', function() {
+  drone.position.y = parseFloat(this.value); // assuming y-axis is for vertical position
+});
+
+
 var animate = function() {
   requestAnimationFrame(animate);
+
   camera.lookAt(drone.position);
-  camera.position.copy(drone.position).add(cameraoffset);
+
+  var targetPosition = new THREE.Vector3();
+  targetPosition.copy(drone.position).add(cameraoffset);
+
+  // Interpolate camera position towards the target position
+  camera.position.lerp(targetPosition, cameraLerpFactor);
+
   renderer.render(scene, camera);
   updateInfo();
 };
