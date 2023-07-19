@@ -15,6 +15,7 @@ var renderer = new THREE.WebGLRenderer();
 
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
+var mixer;
 
 // gltf loader with draco decoder
 var loader = new GLTFLoader();
@@ -28,8 +29,20 @@ loader.load(
       drone.position.x = 0;
       drone.position.z = 0;
       drone.scale.set(5,5,5);
-      console.log(drone);
       scene.add(drone);
+
+        // Create an AnimationMixer instance and set it to the drone
+        mixer = new THREE.AnimationMixer(drone);
+
+        // Get all animations from the glTF model
+        gltf.animations.forEach((clip) => {
+            // Create an AnimationAction for each animation and play it
+            mixer.clipAction(clip).play();
+        });
+      
+      console.log(drone);
+
+
     },
     undefined,
     function(error) {
@@ -138,11 +151,17 @@ altitudeInput.addEventListener('input', function() {
   drone.position.y = parseFloat(this.value); // assuming y-axis is for vertical position
 });
 
+var clock = new THREE.Clock();
 
 var animate = function() {
   requestAnimationFrame(animate);
 
   camera.lookAt(drone.position);
+  var deltaTime = clock.getDelta();
+  if (mixer) {
+    mixer.update(deltaTime*drone.position.y*5);
+  }
+
 
   var targetPosition = new THREE.Vector3();
   targetPosition.copy(drone.position).add(cameraoffset);
