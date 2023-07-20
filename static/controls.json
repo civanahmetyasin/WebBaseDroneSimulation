@@ -13,5 +13,6 @@
   { "roll": 120, "pitch": 130, "yaw": 140, "throttle": 150 },
   { "roll": 130, "pitch": 140, "yaw": 150, "throttle": 160 },
   { "roll": 140, "pitch": 150, "yaw": 160, "throttle": 170 },
-  { "roll": 150, "pitch": 160, "yaw": 170, "throttle": 180 }
+  { "roll": 150, "pitch": 160, "yaw": 170, "throttle": 180 },
+  { "roll": 160, "pitch": 170, "yaw": 180, "throttle": 190 }
 ]

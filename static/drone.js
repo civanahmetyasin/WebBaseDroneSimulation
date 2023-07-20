@@ -165,51 +165,75 @@ var controlSignalz = 0;
 // import the fs module at the beginning of your file
 
 // read the JSON file every second
-let controlIndex = 0; // Keep track of which control we're on
+var controlIndex = 0; // Keep track of which control we're on
 var targetPosition = new THREE.Vector3(); // Declare it outside the interval to avoid re-declarations
+var lerpFactor = 0.05;  // Adjust this value as needed for smoothness
+var interpolatedControls;  // Will hold the interpolated controls
 
+// Function to interpolate control data
+function interpolateData(data, steps) {
+  const interpolatedData = [];
+
+  for (let i = 0; i < data.length - 1; i++) {
+    const start = data[i];
+    const end = data[i + 1];
+
+    for (let j = 0; j < steps; j++) {
+      const t = j / steps;
+      const interpolatedControl = {
+        roll: start.roll + t * (end.roll - start.roll),
+        pitch: start.pitch + t * (end.pitch - start.pitch),
+        yaw: start.yaw + t * (end.yaw - start.yaw),
+        throttle: start.throttle + t * (end.throttle - start.throttle)
+      };
+
+      interpolatedData.push(interpolatedControl);
+    }
+  }
+
+  return interpolatedData;
+}
+
+// Fetch the controls and interpolate them
+fetch('/controls.json')
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(controlsArray => {
+    interpolatedControls = interpolateData(controlsArray, 10);
+  })
+  .catch(error => {
+    console.error('Failed to fetch file:', error);
+  });
+
+// Inside the setInterval function
 setInterval(() => {
-  fetch('/controls.json')
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(controlsArray => {
-      if (!drone) return; // Don't update if drone model has not loaded yet
+  if (!drone || !interpolatedControls) return; // Don't update if drone model has not loaded yet or controls are not ready yet
 
-      // Use the current control and then move to the next one
-      const controls = controlsArray[controlIndex];
-      controlIndex = (controlIndex + 1) % controlsArray.length;
+  // Use the current control and then move to the next one
+  const controls = interpolatedControls[controlIndex];
+  controlIndex = (controlIndex + 1) % interpolatedControls.length;
 
-      var roll = scale(controls.roll, -127, 127, -Math.PI, Math.PI);
-      var signalx = scale(controls.roll, -127, 127, -3, 3);
-      var pitch = scale(controls.pitch, -127, 127, -Math.PI, Math.PI);
-      var signalz = scale(controls.pitch, -127, 127, -3, 3);
-      var yaw = scale(controls.yaw, -127, 127, -Math.PI, Math.PI);
-      var throttle = scale(controls.throttle, -127, 127, -3, 3);
+  var roll = scale(controls.roll, -127, 127, -Math.PI, Math.PI);
+  var signalx = scale(controls.roll, -127, 127, -3, 3);
+  var pitch = scale(controls.pitch, -127, 127, -Math.PI, Math.PI);
+  var signalz = scale(controls.pitch, -127, 127, -3, 3);
+  var yaw = scale(controls.yaw, -127, 127, -Math.PI, Math.PI);
+  var throttle = scale(controls.throttle, -127, 127, -3, 3);
+  var targetRotation = new THREE.Euler(pitch, yaw, roll * -1, 'YXZ');
+  targetPosition.set(signalx * -1, throttle * 1, signalz * -1);
 
-      controlSignal += throttle * 0.1;
+  // Apply the controls by lerping each component separately
+  drone.rotation.x += (targetRotation.x - drone.rotation.x) * lerpFactor;
+  drone.rotation.y += (targetRotation.y - drone.rotation.y) * lerpFactor;
+  drone.rotation.z += (targetRotation.z - drone.rotation.z) * lerpFactor;
+  console.log(drone.rotation.x, drone.rotation.y, drone.rotation.z);
 
-      controlSignalx += signalx * -0.1;
-      controlSignalz += signalz * -0.1;
-
-      drone.rotation.x = pitch;
-      drone.rotation.y = yaw;
-      drone.rotation.z = roll * -1;
-
-      drone.position.y = controlSignal * 1;
-      drone.position.x = controlSignalx * -1;
-      drone.position.z = controlSignalz * -1;
-      // Apply the controls using lerp for smooth transitions
-      targetPosition.set(controlSignalx * -1, controlSignal * 1, controlSignalz * -1);
-      drone.position.lerp(targetPosition, 0.05); // Adjust the 0.05 value as needed for smoothness
-    })
-    .catch(error => {
-      console.error('Failed to fetch file:', error);
-    });
-}, 1000);
+  drone.position.lerp(targetPosition, lerpFactor); // You can still use lerp for position
+}, 100);
 function scale(value, inMin, inMax, outMin, outMax) {
   return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
 }
