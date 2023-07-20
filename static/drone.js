@@ -212,10 +212,16 @@ fetch('/controls.json')
 // Inside the setInterval function
 setInterval(() => {
   if (!drone || !interpolatedControls) return; // Don't update if drone model has not loaded yet or controls are not ready yet
+  
+  if (controlIndex >= interpolatedControls.length) return;
+
 
   // Use the current control and then move to the next one
   const controls = interpolatedControls[controlIndex];
   controlIndex = (controlIndex + 1) % interpolatedControls.length;
+  controlIndex++; // This stops the controls from looping
+  console.log(controlIndex);
+
 
   var roll = scale(controls.roll, -127, 127, -Math.PI, Math.PI);
   var signalx = scale(controls.roll, -127, 127, -3, 3);
