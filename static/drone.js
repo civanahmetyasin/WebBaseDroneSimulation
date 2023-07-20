@@ -29,6 +29,14 @@ loader.load(
       drone.position.x = 0;
       drone.position.z = 0;
       drone.scale.set(5,5,5);
+      drone.traverse(function(child) {
+        if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+            child.material.color.setHex(0xffffff, 1);
+
+        }
+      });
       scene.add(drone);
 
         // Create an AnimationMixer instance and set it to the drone
@@ -49,19 +57,59 @@ loader.load(
       console.error(error);
     });
 
-var light = new THREE.AmbientLight(0xffffff, 5);
-scene.add(light);
+var scan_two;
+var scan_three;
+loader.load(
+    '/models/scan.gltf',
+    function(gltf) {
+      var scan = gltf.scene;
+      scan.position.y = 0;
+      scan.position.x = -20;
+      scan.position.z = 20;
+      scan.rotation.y = Math.PI/2;
+      scene.add(scan);
+      //change color of scan to grey
+      scan.traverse(function(child) {
+        if (child.isMesh) {
+          child.material.color.setHex(0xaaaaaa, 0.5);
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      }
+      );
 
-scene.background = new THREE.Color(0xffffff);
-scene.add(new THREE.GridHelper(1000, 100, 0x000000, 0x000000));
-scene.add(new THREE.AxesHelper(1000));
-scene.fog = new THREE.Fog(0xffffff, 10, 100);
+      scan_two = scan.clone();
+      scan_two.position.set(10, 0, 30); 
+      scene.add(scan_two);
+      console.log(scan);
 
-var controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(0, 0, 0);
-controls.update();
+      scan_three = scan.clone();
+      scan_three.position.set(-18, 0, 60);
+      scan_three.scale.set(0.7, 0.7, 0.7);
+      scene.add(scan_three);
+        
+
+    },
+    undefined,
+    function(error) {
+      console.error(error);
+    });
 
 
+  var light = new THREE.AmbientLight(0x888888,1);
+  var pointLight = new THREE.PointLight(0xffffff, 0.5, 100);
+  pointLight.position.set(10, 20, 10);
+  scene.add(light, pointLight);
+  
+  scene.background = new THREE.Color(0xffffff);
+  scene.add(new THREE.GridHelper(1000, 100, 0x000000, 0x000000));
+  scene.add(new THREE.AxesHelper(1000));
+  scene.fog = new THREE.Fog(0xffffff, 50, 100);
+  
+  camera.position.set(0, 0, 10);
+  var controls = new OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 0, 0);
+  controls.update();
 
 
 camera.position.z = 5;
