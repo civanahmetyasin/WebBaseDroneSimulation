@@ -16,8 +16,10 @@ var renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 var mixer;
+var mixer_two;
 
 // gltf loader with draco decoder
+var drone_two;
 var loader = new GLTFLoader();
 loader.setDRACOLoader(new DRACOLoader().setDecoderPath('https://www.gstatic.com/draco/v1/decoders/'));
 var drone;
@@ -37,16 +39,24 @@ loader.load(
 
         }
       });
+      drone_two = drone.clone();
+      drone_two.position.set(10, 0, 0);
+      scene.add(drone_two);
+      
       scene.add(drone);
 
         // Create an AnimationMixer instance and set it to the drone
         mixer = new THREE.AnimationMixer(drone);
+        mixer_two = new THREE.AnimationMixer(drone_two);
 
         // Get all animations from the glTF model
         gltf.animations.forEach((clip) => {
             // Create an AnimationAction for each animation and play it
             mixer.clipAction(clip).play();
+            mixer_two.clipAction(clip).play();
         });
+
+        
       
       console.log(drone);
 
@@ -233,12 +243,12 @@ setInterval(() => {
   targetPosition.set(signalx * -1, throttle * 1, signalz * -1);
 
   // Apply the controls by lerping each component separately
-  drone.rotation.x += (targetRotation.x - drone.rotation.x) * lerpFactor;
-  drone.rotation.y += (targetRotation.y - drone.rotation.y) * lerpFactor;
-  drone.rotation.z += (targetRotation.z - drone.rotation.z) * lerpFactor;
-  console.log(drone.rotation.x, drone.rotation.y, drone.rotation.z);
+  drone_two.rotation.x += (targetRotation.x - drone_two.rotation.x) * lerpFactor;
+  drone_two.rotation.y += (targetRotation.y - drone_two.rotation.y) * lerpFactor;
+  drone_two.rotation.z += (targetRotation.z - drone_two.rotation.z) * lerpFactor;
+  console.log(drone_two.rotation.x, drone_two.rotation.y, drone_two.rotation.z);
 
-  drone.position.lerp(targetPosition, lerpFactor); // You can still use lerp for position
+  drone_two.position.lerp(targetPosition, lerpFactor); // You can still use lerp for position
 }, 100);
 function scale(value, inMin, inMax, outMin, outMax) {
   return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
@@ -286,6 +296,7 @@ var animate = function() {
   var deltaTime = clock.getDelta();
   if (mixer) {
     mixer.update(deltaTime*drone.position.y*5);
+    mixer_two.update(deltaTime*drone_two.position.y*5);
   }
 
 
