@@ -14,5 +14,21 @@
   { "roll": 130, "pitch": 140, "yaw": 150, "throttle": 160 },
   { "roll": 140, "pitch": 150, "yaw": 160, "throttle": 170 },
   { "roll": 150, "pitch": 160, "yaw": 170, "throttle": 180 },
-  { "roll": 160, "pitch": 170, "yaw": 180, "throttle": 190 }
+  { "roll": 160, "pitch": 170, "yaw": 180, "throttle": 190 },
+  { "roll": 170, "pitch": 180, "yaw": 190, "throttle": 200 },
+  { "roll": 180, "pitch": 190, "yaw": 200, "throttle": 210 },
+  { "roll": 190, "pitch": 200, "yaw": 210, "throttle": 220 },
+  { "roll": 200, "pitch": 210, "yaw": 220, "throttle": 230 },
+  { "roll": 210, "pitch": 220, "yaw": 230, "throttle": 240 },
+  { "roll": 220, "pitch": 230, "yaw": 240, "throttle": 250 },
+  { "roll": 230, "pitch": 240, "yaw": 250, "throttle": 260 },
+  { "roll": 240, "pitch": 250, "yaw": 260, "throttle": 270 },
+  { "roll": 250, "pitch": 260, "yaw": 270, "throttle": 280 },
+  { "roll": 260, "pitch": 270, "yaw": 280, "throttle": 290 },
+  { "roll": 270, "pitch": 280, "yaw": 290, "throttle": 300 },
+  { "roll": 280, "pitch": 290, "yaw": 300, "throttle": 310 },
+  { "roll": 290, "pitch": 300, "yaw": 310, "throttle": 320 },
+  { "roll": 300, "pitch": 310, "yaw": 320, "throttle": 330 },
+  { "roll": 310, "pitch": 320, "yaw": 330, "throttle": 340 },
+  { "roll": 320, "pitch": 330, "yaw": 340, "throttle": 350 }
 ]
