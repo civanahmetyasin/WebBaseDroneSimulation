@@ -114,11 +114,10 @@ loader.load(
   scene.background = new THREE.Color(0xffffff);
   scene.add(new THREE.GridHelper(1000, 100, 0x000000, 0x000000));
   scene.add(new THREE.AxesHelper(1000));
-  scene.fog = new THREE.Fog(0xffffff, 50, 100);
+  scene.fog = new THREE.Fog(0xffffff, 40, 100);
   
   camera.position.set(0, 5, -10);
   var controls = new OrbitControls(camera, renderer.domElement);
-  controls.target.set(0, 0, 0);
   controls.update();
 
 
@@ -271,8 +270,8 @@ function updateInfo() {
                                          + drone.position.z.toFixed(2) + ')';
 }
 
-var cameraoffset = new THREE.Vector3(0, 10, -10);
-var cameraLerpFactor = 0.05; // control the speed of interpolation (0.05 is a good starting value)
+var cameraoffset = new THREE.Vector3(10, 10, -10);
+var cameraLerpFactor = 0.005; // control the speed of interpolation (0.05 is a good starting value)
 
 
 var gasInput = document.getElementById('gas-input');
