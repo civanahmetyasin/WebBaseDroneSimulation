@@ -118,50 +118,98 @@ var controlSignal = 0;
 var controlSignalx = 0;
 var controlSignalz = 0;
 
-ws.onmessage =
-    function(event) {
-  var data = JSON.parse(event.data);
-  var roll = scale(data.roll, -127, 127, -Math.PI, Math.PI);
-  var signalx = scale(data.roll, -127, 127, -3, 3);
-  var pitch = scale(data.pitch, -127, 127, -Math.PI, Math.PI);
-  var signalz = scale(data.pitch, -127, 127, -3, 3);
-  var yaw = scale(data.yaw, -127, 127, -Math.PI, Math.PI);
-  desiredAltitude = scale(data.throttle, -127, 127, -3, 3);
+//ws.onmessage =
+//    function(event) {
+//  var data = JSON.parse(event.data);
+//  var roll = scale(data.roll, -127, 127, -Math.PI, Math.PI);
+//  var signalx = scale(data.roll, -127, 127, -3, 3);
+//  var pitch = scale(data.pitch, -127, 127, -Math.PI, Math.PI);
+//  var signalz = scale(data.pitch, -127, 127, -3, 3);
+//  var yaw = scale(data.yaw, -127, 127, -Math.PI, Math.PI);
+//  desiredAltitude = scale(data.throttle, -127, 127, -3, 3);
+//
+//  if (desiredAltitude <= 0) {
+//    desiredAltitude += 3;
+//  } else {
+//    desiredAltitude -= 3;
+//  }
+//
+//  if (signalx <= 0) {
+//    signalx += 3;
+//  } else {
+//    signalx -= 3;
+//  }
+//
+//  if (signalz <= 0) {
+//    signalz += 3;
+//  } else {
+//    signalz -= 3;
+//  }
+//
+//
+//  controlSignal += desiredAltitude * 0.1;
+//
+//  controlSignalx += signalx * -0.1;
+//  controlSignalz += signalz * -0.1;
+//
+//  drone.rotation.x = pitch;
+//  drone.rotation.y = yaw;
+//  drone.rotation.z = roll * -1;
+//
+//  drone.position.y = controlSignal * -1;
+//  drone.position.x = controlSignalx * -1;
+//  drone.position.z = controlSignalz * -1;
+//}
+//
+//
+// import the fs module at the beginning of your file
 
-  if (desiredAltitude <= 0) {
-    desiredAltitude += 3;
-  } else {
-    desiredAltitude -= 3;
-  }
+// read the JSON file every second
+let controlIndex = 0; // Keep track of which control we're on
+var targetPosition = new THREE.Vector3(); // Declare it outside the interval to avoid re-declarations
 
-  if (signalx <= 0) {
-    signalx += 3;
-  } else {
-    signalx -= 3;
-  }
+setInterval(() => {
+  fetch('/controls.json')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(controlsArray => {
+      if (!drone) return; // Don't update if drone model has not loaded yet
 
-  if (signalz <= 0) {
-    signalz += 3;
-  } else {
-    signalz -= 3;
-  }
+      // Use the current control and then move to the next one
+      const controls = controlsArray[controlIndex];
+      controlIndex = (controlIndex + 1) % controlsArray.length;
 
+      var roll = scale(controls.roll, -127, 127, -Math.PI, Math.PI);
+      var signalx = scale(controls.roll, -127, 127, -3, 3);
+      var pitch = scale(controls.pitch, -127, 127, -Math.PI, Math.PI);
+      var signalz = scale(controls.pitch, -127, 127, -3, 3);
+      var yaw = scale(controls.yaw, -127, 127, -Math.PI, Math.PI);
+      var throttle = scale(controls.throttle, -127, 127, -3, 3);
 
-  controlSignal += desiredAltitude * 0.1;
+      controlSignal += throttle * 0.1;
 
-  controlSignalx += signalx * -0.1;
-  controlSignalz += signalz * -0.1;
+      controlSignalx += signalx * -0.1;
+      controlSignalz += signalz * -0.1;
 
-  drone.rotation.x = pitch;
-  drone.rotation.y = yaw;
-  drone.rotation.z = roll * -1;
+      drone.rotation.x = pitch;
+      drone.rotation.y = yaw;
+      drone.rotation.z = roll * -1;
 
-  drone.position.y = controlSignal * -1;
-  drone.position.x = controlSignalx * -1;
-  drone.position.z = controlSignalz * -1;
-}
-
-
+      drone.position.y = controlSignal * 1;
+      drone.position.x = controlSignalx * -1;
+      drone.position.z = controlSignalz * -1;
+      // Apply the controls using lerp for smooth transitions
+      targetPosition.set(controlSignalx * -1, controlSignal * 1, controlSignalz * -1);
+      drone.position.lerp(targetPosition, 0.05); // Adjust the 0.05 value as needed for smoothness
+    })
+    .catch(error => {
+      console.error('Failed to fetch file:', error);
+    });
+}, 1000);
 function scale(value, inMin, inMax, outMin, outMax) {
   return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
 }
