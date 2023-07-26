@@ -126,54 +126,65 @@ var controlSignal = 0;
 var controlSignalx = 0;
 var controlSignalz = 0;
 
-//ws.onmessage =
-//    function(event) {
-//  var data = JSON.parse(event.data);
-//  var roll = scale(data.roll, -127, 127, -Math.PI, Math.PI);
-//  var signalx = scale(data.roll, -127, 127, -3, 3);
-//  var pitch = scale(data.pitch, -127, 127, -Math.PI, Math.PI);
-//  var signalz = scale(data.pitch, -127, 127, -3, 3);
-//  var yaw = scale(data.yaw, -127, 127, -Math.PI, Math.PI);
-//  desiredAltitude = scale(data.throttle, -127, 127, -3, 3);
-//
-//  if (desiredAltitude <= 0) {
-//    desiredAltitude += 3;
-//  } else {
-//    desiredAltitude -= 3;
-//  }
-//
-//  if (signalx <= 0) {
-//    signalx += 3;
-//  } else {
-//    signalx -= 3;
-//  }
-//
-//  if (signalz <= 0) {
-//    signalz += 3;
-//  } else {
-//    signalz -= 3;
-//  }
-//
-//
-//  controlSignal += desiredAltitude * 0.1;
-//
-//  controlSignalx += signalx * -0.1;
-//  controlSignalz += signalz * -0.1;
-//
-//  drone.rotation.x = pitch;
-//  drone.rotation.y = yaw;
-//  drone.rotation.z = roll * -1;
-//
-//  drone.position.y = controlSignal * -1;
-//  drone.position.x = controlSignalx * -1;
-//  drone.position.z = controlSignalz * -1;
-//}
+ws.onmessage =
+    function(event) {
+  var data = JSON.parse(event.data);
+  var roll = scale(data.roll * -1, -127, 127, -Math.PI, Math.PI);
+  var signalx = scale(data.roll, -127, 127, -3, 3);
+  var pitch = scale(data.pitch * -1, -127, 127, -Math.PI, Math.PI);
+  var signalz = scale(data.pitch, -127, 127, -3, 3);
+  var yaw = scale(data.yaw, -127, 127, -Math.PI, Math.PI);
+  var desiredAltitude = scale(data.throttle, -127, 127, -3, 3);
+
+  if (desiredAltitude <= 0) {
+    desiredAltitude += 3;
+  } else {
+    desiredAltitude -= 3;
+  }
+
+  if (signalx <= 0) {
+    signalx += 3;
+  } else {
+    signalx -= 3;
+  }
+
+  if (signalz <= 0) {
+    signalz += 3;
+  } else {
+    signalz -= 3;
+  }
+
+
+  controlSignal += desiredAltitude * 0.1;
+
+  controlSignalx += signalx * -0.1;
+  controlSignalz += signalz * -0.1;
+
+
+  drone.rotation.x = pitch;
+  if (yaw < 3.10 && yaw > -3.10) {
+    drone.rotation.y += yaw / 1000;
+  }
+  drone.rotation.z = roll * -1;
+
+  // calculate the new position with drone yaw rotation
+  // var x = Math.cos(drone.rotation.y) * controlSignalx -
+  //     Math.sin(drone.rotation.y) * controlSignalz;
+  // var z = Math.sin(drone.rotation.y) * controlSignalx +
+  //     Math.cos(drone.rotation.y) * controlSignalz;
+  // drone.position.x = x * -1;
+  // drone.position.z = z * -1;
+
+  drone.position.y = controlSignal * -1;
+  drone.position.x = controlSignalx;
+  drone.position.z = controlSignalz;
+}
 //
 //
 // import the fs module at the beginning of your file
 
 // read the JSON file every second
-var controlIndex = 0; // Keep track of which control we're on
+var controlIndex = 0;  // Keep track of which control we're on
 var targetPosition = new THREE.Vector3(); // Declare it outside the interval to avoid re-declarations
 var lerpFactor = 0.05;  // Adjust this value as needed for smoothness
 var interpolatedControls;  // Will hold the interpolated controls
@@ -276,13 +287,14 @@ var cameraLerpFactor = 0.005; // control the speed of interpolation (0.05 is a g
 
 var gasInput = document.getElementById('gas-input');
 gasInput.addEventListener('input', function() {
-  drone.position.z = parseFloat(this.value);
+  // drone.position.z = parseFloat(this.value);
 });
 
 // Adding altitude control
 var altitudeInput = document.getElementById('altitude-input');
 altitudeInput.addEventListener('input', function() {
-  drone.position.y = parseFloat(this.value); // assuming y-axis is for vertical position
+  // drone.position.y = parseFloat(this.value); // assuming y-axis is for
+  // vertical position
 });
 
 var clock = new THREE.Clock();
