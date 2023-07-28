@@ -306,13 +306,22 @@ var droneCamera = new THREE.PerspectiveCamera(
   75, window.innerWidth / window.innerHeight, 0.1, 1000);
 droneCamera.position.set(0, 2, -5); // Position the droneCamera at the back of the drone
 
-var droneView = false;  // By default, the view is set to the main camera
+var droneCameraTwo = droneCamera.clone();
 
-// Listen to keydown event
+
+var droneView = false;  // By default, the view is set to the main camera
+var bottomView = false;  // View from the bottom of the drone
+
 window.addEventListener('keydown', function(event) {
   // If key pressed is 'C' or 'c'
   if (event.key === 'C' || event.key === 'c') {
-    droneView = !droneView;  // Toggle the view
+    droneView = !droneView;  // Toggle the drone view
+    bottomView = false;  // If drone view is active, bottom view must be deactivated
+  }
+  // If key pressed is 'M' or 'm'
+  else if (event.key === 'M' || event.key === 'm') {
+    bottomView = !bottomView;  // Toggle the bottom view
+    droneView = false;  // If bottom view is active, drone view must be deactivated
   }
 });
 
@@ -380,8 +389,16 @@ window.addEventListener('keydown', function(event) {
 var animate = function() {
   requestAnimationFrame(animate);
 
-  // Depending on the value of droneView, set the camera to render the scene
-  var activeCamera = droneView ? droneCamera : camera;
+
+  // Depending on the value of droneView and bottomView, set the camera to render the scene
+  var activeCamera;
+  if (droneView) {
+    activeCamera = droneCamera;
+  } else if (bottomView) {
+    activeCamera = droneCameraTwo;
+  } else {
+    activeCamera = camera;
+  }
 
   // Position the droneCamera relative to the drone's position
   if (droneView) {
@@ -389,6 +406,10 @@ var animate = function() {
     droneCamera.position.y -= 0.2;  // Position camera above the drone
     droneCamera.position.z += 0.5;  // Position camera at the back of the drone
     droneCamera.lookAt(drone.position.x, drone.position.y+1, drone.position.z+5);
+  } else if (bottomView) {
+    droneCameraTwo.position.copy(drone.position);
+    droneCameraTwo.position.y -= 0.2;  // Position camera above the drone
+    droneCameraTwo.lookAt(new THREE.Vector3(drone.position.x, drone.position.y -5, drone.position.z));  // Camera looks at a point beneath the drone
   } else {
     camera.lookAt(drone.position);
   }
