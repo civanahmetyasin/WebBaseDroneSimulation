@@ -30,7 +30,8 @@
     transform: translateX(-50%);
     display: flex;
     align-items: center;
-    gap: 20px;
+    justify-content: space-around;
+    gap: 50px;
   }
 
   .panel {
@@ -39,22 +40,46 @@
     border-radius: 30px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
     border: 2px solid #A40808;
   }
 
-  #gas-panel input[type="range"] {
-    flex-grow: 1;
-    margin: 0 10px;
-    width: 200px; /* increase or decrease as needed */
+  .joystick-container {
+    width: 150px;
+    height: 150px;
+    background: rgba(11, 10, 10, 0.1);
+    border-radius: 75px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  #altitude-panel input[type="range"] {
-    writing-mode: bt-lr; /* IE */
-    -webkit-appearance: slider-vertical; /* WebKit */
-    width: 8px;
-    height: 150px; /* increase or decrease as needed */
-    padding: 0 10px;
+  .joystick {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: #A40808;
+    border-radius: 25px;
+    transition: all 0.2s ease;
+  }
+
+  /* Crosshair styles */
+  .joystick-container::before, .joystick-container::after {
+    content: "";
+    position: absolute;
+    background: #A40808;
+  }
+
+  .joystick-container::before {
+    width: 2px;
+    height: 100%;
+    
+  }
+
+  .joystick-container::after {
+    width: 100%;
+    height: 2px;
   }
   </style>
 </head>
@@ -65,18 +90,18 @@
   </div>
 
   <div id="control-panel">
-    <div id="gas-panel" class="panel">
-      <label for="gas-input">Gas: </label>
-      <input id="gas-input" type="range" min="0" max="100" step="0.1" value="0">
+    <div id="joystick-container-vertical" class="panel joystick-container">
+      <div id="joystick-vertical" class="joystick"></div>
     </div>
-
-    <div id="altitude-panel" class="panel">
-      <label for="altitude-input">Altitude: </label>
-      <input id="altitude-input" type="range" min="0" max="100" step="0.1" value="0" orient="vertical">
+    <div id="joystick-container-horizontal" class="panel joystick-container">
+      <div id="joystick-horizontal" class="joystick"></div>
     </div>
   </div>
 
   <script src="https://threejs.org/build/three.js"></script>
   <script type="module" src="drone.js"></script>
+
+  <script>
+  </script>
 </body>
 </html>
