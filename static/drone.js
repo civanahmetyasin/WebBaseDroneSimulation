@@ -357,12 +357,14 @@ loader.load(
 
 
 var bombDropped = false;
+var bombAnimation = false
 
 
 window.addEventListener('keydown', function(event) {
   // If key pressed is 'B' or 'b'
   if (event.key === 'B' || event.key === 'b') {
     bombDropped = true;
+    bombAnimation = true;
   }
 });
 
@@ -401,7 +403,7 @@ var animate = function() {
   if (!bombDropped) {
     bomb.position.copy(drone.position);
     bomb.position.y -= 0.4;
-    bomb.position.z += 1.5;
+    bomb.position.z -= 0.1;
   }
 
   
@@ -413,10 +415,11 @@ var animate = function() {
     }
   }
 
-  if (bomb.position.y == 0) {
-    mixerbomb.update(deltaTime*5);
+  if (bomb.position.y == 0 && bombAnimation) {
+    mixerbomb.update(deltaTime*drone.position.y*0.5);
   }
-  
+
+
 
   renderer.render(scene, activeCamera);
   updateInfo();
