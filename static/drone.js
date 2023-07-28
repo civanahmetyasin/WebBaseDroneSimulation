@@ -27,7 +27,7 @@ loader.load(
     '/models/Drone.glb',
     function(gltf) {
       drone = gltf.scene;
-      drone.position.y = 0;
+      drone.position.y = 15;
       drone.position.x = 0;
       drone.position.z = 0;
       drone.scale.set(5,5,5);
@@ -409,6 +409,7 @@ var animate = function() {
   } else if (bottomView) {
     droneCameraTwo.position.copy(drone.position);
     droneCameraTwo.position.y -= 0.2;  // Position camera above the drone
+    droneCameraTwo.position.z -= 0.1;  // Position camera at the back of the drone
     droneCameraTwo.lookAt(new THREE.Vector3(drone.position.x, drone.position.y -5, drone.position.z));  // Camera looks at a point beneath the drone
   } else {
     camera.lookAt(drone.position);
