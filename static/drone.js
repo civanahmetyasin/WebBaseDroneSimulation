@@ -287,37 +287,90 @@ var cameraLerpFactor = 0.005; // control the speed of interpolation (0.05 is a g
 
 var gasInput = document.getElementById('gas-input');
 gasInput.addEventListener('input', function() {
-  // drone.position.z = parseFloat(this.value);
+   //drone.position.z = parseFloat(this.value);
 });
 
 // Adding altitude control
 var altitudeInput = document.getElementById('altitude-input');
 altitudeInput.addEventListener('input', function() {
-  // drone.position.y = parseFloat(this.value); // assuming y-axis is for
-  // vertical position
+  //drone.position.y = parseFloat(this.value); // assuming y-axis is for
+  //vertical position
 });
 
 var clock = new THREE.Clock();
 
+var droneCamera = new THREE.PerspectiveCamera(
+  75, window.innerWidth / window.innerHeight, 0.1, 1000);
+droneCamera.position.set(0, 2, -5); // Position the droneCamera at the back of the drone
+
+var droneView = false;  // By default, the view is set to the main camera
+
+// Listen to keydown event
+window.addEventListener('keydown', function(event) {
+  // If key pressed is 'C' or 'c'
+  if (event.key === 'C' || event.key === 'c') {
+    droneView = !droneView;  // Toggle the view
+  }
+});
+
+var droneCameracontrol = { pitch: 0, yaw: 0 };  // Control object to store pitch and yaw values
+
+ws.onmessage = function(event) {
+  // Assuming the incoming message is in the format: { pitch: 0.1, yaw: 0.2 }
+  var data = JSON.parse(event.data);
+
+  // Update the control object with the new pitch and yaw values
+  droneCameracontrol.pitch = data.pitch;
+  droneCameracontrol.yaw = data.yaw;
+};
+
+window.addEventListener('keydown', function(event) {
+  if (event.key === 'V' || event.key === 'v') {
+    // If drone view is active, update the droneCamera's rotation based on the control values
+    if (droneView) {
+      droneCamera.rotation.x += droneCameracontrol.pitch;  // Rotate around the x-axis
+      droneCamera.rotation.y += droneCameracontrol.yaw;  // Rotate around the y-axis
+    }
+  } 
+});
+
+// Inside the animate function
 var animate = function() {
   requestAnimationFrame(animate);
 
-  camera.lookAt(drone.position);
+  // Depending on the value of droneView, set the camera to render the scene
+  var activeCamera = droneView ? droneCamera : camera;
+
+  // Position the droneCamera relative to the drone's position
+  if (droneView) {
+    droneCamera.position.copy(drone.position);
+    droneCamera.position.y += 0;  // Position camera above the drone
+    droneCamera.position.z -= 0;  // Position camera at the back of the drone
+    droneCamera.lookAt(drone.position);
+  } else {
+    camera.lookAt(drone.position);
+  }
+
   var deltaTime = clock.getDelta();
   if (mixer) {
     mixer.update(deltaTime*drone.position.y*5);
     mixer_two.update(deltaTime*drone_two.position.y*5);
   }
 
-
   var targetPosition = new THREE.Vector3();
   targetPosition.copy(drone.position).add(cameraoffset);
 
   // Interpolate camera position towards the target position
-  camera.position.lerp(targetPosition, cameraLerpFactor);
+  if (!droneView) {
+    camera.position.lerp(targetPosition, cameraLerpFactor);
+  }
 
-  renderer.render(scene, camera);
+  renderer.render(scene, activeCamera);
   updateInfo();
 };
 
 animate();
+
+
+
+
