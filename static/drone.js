@@ -58,7 +58,6 @@ loader.load(
 
         
       
-      console.log(drone);
 
 
     },
@@ -91,7 +90,6 @@ loader.load(
       scan_two = scan.clone();
       scan_two.position.set(10, 0, 30); 
       scene.add(scan_two);
-      console.log(scan);
 
       scan_three = scan.clone();
       scan_three.position.set(-18, 0, 60);
@@ -239,7 +237,6 @@ setInterval(() => {
   const controls = interpolatedControls[controlIndex];
   controlIndex = (controlIndex + 1) % interpolatedControls.length;
   controlIndex++; // This stops the controls from looping
-  console.log(controlIndex);
 
 
   var roll = scale(controls.roll, -127, 127, -Math.PI, Math.PI);
@@ -255,7 +252,6 @@ setInterval(() => {
   drone_two.rotation.x += (targetRotation.x - drone_two.rotation.x) * lerpFactor;
   drone_two.rotation.y += (targetRotation.y - drone_two.rotation.y) * lerpFactor;
   drone_two.rotation.z += (targetRotation.z - drone_two.rotation.z) * lerpFactor;
-  console.log(drone_two.rotation.x, drone_two.rotation.y, drone_two.rotation.z);
 
   drone_two.position.lerp(targetPosition, lerpFactor); // You can still use lerp for position
 }, 100);
@@ -287,7 +283,7 @@ var cameraLerpFactor = 0.005; // control the speed of interpolation (0.05 is a g
 
 var gasInput = document.getElementById('gas-input');
 gasInput.addEventListener('input', function() {
-   //drone.position.z = parseFloat(this.value);
+  //drone.position.z = parseFloat(this.value);
 });
 
 // Adding altitude control
@@ -334,6 +330,43 @@ window.addEventListener('keydown', function(event) {
   } 
 });
 
+var bomb;
+var mixerbomb;
+loader.load(
+    '/models/bomb2.glb',
+    function(gltf) {
+      bomb = gltf.scene;
+      bomb.scale.set(0.1,0.1,0.1);
+      bomb.position.set(0, -0.2, 0); //initial position at the origin
+      scene.add(bomb);
+
+          // Create an AnimationMixer instance and set it to the drone
+          mixerbomb = new THREE.AnimationMixer(bomb);
+  
+          // Get all animations from the glTF model
+          gltf.animations.forEach((clip) => {
+              // Create an AnimationAction for each animation and play it
+              mixerbomb.clipAction(clip).play();
+          });
+
+    },
+    undefined,
+    function(error) {
+      console.error(error);
+    });
+
+
+var bombDropped = false;
+
+
+window.addEventListener('keydown', function(event) {
+  // If key pressed is 'B' or 'b'
+  if (event.key === 'B' || event.key === 'b') {
+    bombDropped = true;
+  }
+});
+
+
 // Inside the animate function
 var animate = function() {
   requestAnimationFrame(animate);
@@ -344,9 +377,9 @@ var animate = function() {
   // Position the droneCamera relative to the drone's position
   if (droneView) {
     droneCamera.position.copy(drone.position);
-    droneCamera.position.y += 0;  // Position camera above the drone
-    droneCamera.position.z -= 0;  // Position camera at the back of the drone
-    droneCamera.lookAt(drone.position);
+    droneCamera.position.y -= 0.2;  // Position camera above the drone
+    droneCamera.position.z += 0.5;  // Position camera at the back of the drone
+    droneCamera.lookAt(drone.position.x, drone.position.y+1, drone.position.z+5);
   } else {
     camera.lookAt(drone.position);
   }
@@ -364,6 +397,26 @@ var animate = function() {
   if (!droneView) {
     camera.position.lerp(targetPosition, cameraLerpFactor);
   }
+
+  if (!bombDropped) {
+    bomb.position.copy(drone.position);
+    bomb.position.y -= 0.4;
+    bomb.position.z += 1.5;
+  }
+
+  
+
+  if (bombDropped) {
+    bomb.position.y -= 0.1;  // Change this value to control the speed of the bomb
+    if (bomb.position.y <= 0) {
+      bomb.position.y = 0;
+    }
+  }
+
+  if (bomb.position.y == 0) {
+    mixerbomb.update(deltaTime*5);
+  }
+  
 
   renderer.render(scene, activeCamera);
   updateInfo();
