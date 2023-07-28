@@ -123,7 +123,8 @@ loader.load(
 var controlSignal = 0;
 var controlSignalx = 0;
 var controlSignalz = 0;
-
+var joystickVertical = document.querySelector('#joystick-vertical');
+var joystickHorizontal = document.querySelector('#joystick-horizontal');
 ws.onmessage =
     function(event) {
   var data = JSON.parse(event.data);
@@ -176,7 +177,23 @@ ws.onmessage =
   drone.position.y = controlSignal * -1;
   drone.position.x = controlSignalx;
   drone.position.z = controlSignalz;
+
+  // Update joysticks
+  var joystickMaxMove = 50;  // Maximum pixel distance the joystick can move from the center
+  var scaledX = scale(drone.position.x, -3, 3, -joystickMaxMove, joystickMaxMove);
+  var scaledY = scale(drone.position.y, -3, 3, -joystickMaxMove, joystickMaxMove);
+  var scaledRoll = scale(drone.rotation.z, -Math.PI, Math.PI, -joystickMaxMove, joystickMaxMove);
+  var scaledPitch = scale(drone.rotation.x, -Math.PI, Math.PI, -joystickMaxMove, joystickMaxMove);
+
+  joystickVertical.style.left = `${50 + scaledX}px`;  // 50 is the initial left/top value
+  joystickVertical.style.top = `${50 + scaledY}px`;
+
+  joystickHorizontal.style.left = `${50 + scaledRoll}px`;
+  joystickHorizontal.style.top = `${50 + scaledPitch}px`;
 }
+
+
+
 //
 //
 // import the fs module at the beginning of your file
@@ -281,17 +298,7 @@ var cameraoffset = new THREE.Vector3(10, 10, -10);
 var cameraLerpFactor = 0.005; // control the speed of interpolation (0.05 is a good starting value)
 
 
-var gasInput = document.getElementById('gas-input');
-gasInput.addEventListener('input', function() {
-  //drone.position.z = parseFloat(this.value);
-});
-
-// Adding altitude control
-var altitudeInput = document.getElementById('altitude-input');
-altitudeInput.addEventListener('input', function() {
-  //drone.position.y = parseFloat(this.value); // assuming y-axis is for
-  //vertical position
-});
+// .joystick
 
 var clock = new THREE.Clock();
 
