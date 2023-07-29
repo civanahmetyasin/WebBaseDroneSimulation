@@ -27,7 +27,7 @@ loader.load(
     '/models/Drone.glb',
     function(gltf) {
       drone = gltf.scene;
-      drone.position.y = 15;
+      drone.position.y = 0;
       drone.position.x = 0;
       drone.position.z = 0;
       drone.scale.set(5,5,5);
@@ -118,115 +118,150 @@ loader.load(
   var controls = new OrbitControls(camera, renderer.domElement);
   controls.update();
 
+  var bombDropped = false;
+  var bombAnimation = false;
 
 
-var controlSignal = 0;
-var controlSignalx = 0;
-var controlSignalz = 0;
-var joystickVertical = document.querySelector('#joystick-vertical');
-var joystickHorizontal = document.querySelector('#joystick-horizontal');
-ws.onmessage =
-    function(event) {
-  var data = JSON.parse(event.data);
-  var roll = scale(data.roll * -1, -127, 127, -Math.PI, Math.PI);
-  var signalx = scale(data.roll, -127, 127, -3, 3);
-  var pitch = scale(data.pitch * -1, -127, 127, -Math.PI, Math.PI);
-  var signalz = scale(data.pitch, -127, 127, -3, 3);
-  var yaw = scale(data.yaw, -127, 127, -Math.PI, Math.PI);
-  var desiredAltitude = scale(data.throttle, -127, 127, -3, 3);
+  var controlSignal = 0;
+  var controlSignalx = 0;
+  var controlSignalz = 0;
+  var joystickVertical = document.querySelector('#joystick-vertical');
+  var joystickHorizontal = document.querySelector('#joystick-horizontal');
+  ws.onmessage =
+      function(event) {
+    var data = JSON.parse(event.data);
+    var roll = scale(data.roll * -1, -127, 127, -Math.PI, Math.PI);
+    var signalx = scale(data.roll, -127, 127, -3, 3);
+    var pitch = scale(data.pitch * -1, -127, 127, -Math.PI, Math.PI);
+    var signalz = scale(data.pitch, -127, 127, -3, 3);
+    var yaw = scale(data.yaw, -127, 127, -Math.PI, Math.PI);
+    var desiredAltitude = scale(data.throttle, -127, 127, -3, 3);
 
-  if (desiredAltitude <= 0) {
-    desiredAltitude += 3;
-  } else {
-    desiredAltitude -= 3;
-  }
+    if (desiredAltitude <= 0) {
+      desiredAltitude += 3;
+    } else {
+      desiredAltitude -= 3;
+    }
 
-  if (signalx <= 0) {
-    signalx += 3;
-  } else {
-    signalx -= 3;
-  }
+    if (signalx <= 0) {
+      signalx += 3;
+    } else {
+      signalx -= 3;
+    }
 
-  if (signalz <= 0) {
-    signalz += 3;
-  } else {
-    signalz -= 3;
-  }
-
-
-  controlSignal += desiredAltitude * 0.1;
-
-  controlSignalx += signalx * -0.1;
-  controlSignalz += signalz * -0.1;
+    if (signalz <= 0) {
+      signalz += 3;
+    } else {
+      signalz -= 3;
+    }
 
 
-  drone.rotation.x = pitch;
-  if (yaw < 3.10 && yaw > -3.10) {
-    drone.rotation.y += yaw / 1000;
-  }
-  drone.rotation.z = roll * -1;
+    controlSignal += desiredAltitude * 0.1;
 
-  // calculate the new position with drone yaw rotation
-  // var x = Math.cos(drone.rotation.y) * controlSignalx -
-  //     Math.sin(drone.rotation.y) * controlSignalz;
-  // var z = Math.sin(drone.rotation.y) * controlSignalx +
-  //     Math.cos(drone.rotation.y) * controlSignalz;
-  // drone.position.x = x * -1;
-  // drone.position.z = z * -1;
+    controlSignalx += signalx * -0.1;
+    controlSignalz += signalz * -0.1;
 
-  drone.position.y = controlSignal * -1;
-  drone.position.x = controlSignalx;
-  drone.position.z = controlSignalz;
 
-  // Update joysticks
-  var joystickMaxMove = 50;  // Maximum pixel distance the joystick can move from the center
-  var scaledX = scale(drone.position.x, -3, 3, -joystickMaxMove, joystickMaxMove);
-  var scaledY = scale(drone.position.y, -3, 3, -joystickMaxMove, joystickMaxMove);
-  var scaledRoll = scale(drone.rotation.z, -Math.PI, Math.PI, -joystickMaxMove, joystickMaxMove);
-  var scaledPitch = scale(drone.rotation.x, -Math.PI, Math.PI, -joystickMaxMove, joystickMaxMove);
+    drone.rotation.x = pitch;
+    if (yaw < 3.10 && yaw > -3.10) {
+      drone.rotation.y += yaw / 100;
+    }
+    drone.rotation.z = roll * -1;
 
-  joystickVertical.style.left = `${50 + scaledX}px`;  // 50 is the initial left/top value
-  joystickVertical.style.top = `${50 + scaledY}px`;
-
-  joystickHorizontal.style.left = `${50 + scaledRoll}px`;
-  joystickHorizontal.style.top = `${50 + scaledPitch}px`;
-}
+    // calculate the new position with drone yaw rotation
+    // var x = Math.cos(drone.rotation.y) * controlSignalx -
+    //     Math.sin(drone.rotation.y) * controlSignalz;
+    // var z = Math.sin(drone.rotation.y) * controlSignalx +
+    //     Math.cos(drone.rotation.y) * controlSignalz;
+    // drone.position.x = x * -1;
+    // drone.position.z = z * -1;
 
 
 
-//
-//
-// import the fs module at the beginning of your file
+    drone.position.y = controlSignal * -1;
+    drone.position.x = controlSignalx;
+    drone.position.z = controlSignalz;
 
-// read the JSON file every second
-var controlIndex = 0;  // Keep track of which control we're on
-var targetPosition = new THREE.Vector3(); // Declare it outside the interval to avoid re-declarations
-var lerpFactor = 0.05;  // Adjust this value as needed for smoothness
-var interpolatedControls;  // Will hold the interpolated controls
+    // Update joysticks
+    var joystickMaxMove =
+        50;  // Maximum pixel distance the joystick can move from the center
+    var scaledX = scale(signalx, -3, 3, -joystickMaxMove, joystickMaxMove);
+    var scaledY = scale(signalz, -3, 3, -joystickMaxMove, joystickMaxMove);
+    var scaledRoll =
+        scale(roll, -Math.PI, Math.PI, -joystickMaxMove, joystickMaxMove);
+    var scaledPitch =
+        scale(pitch, -Math.PI, Math.PI, -joystickMaxMove, joystickMaxMove);
 
-// Function to interpolate control data
-function interpolateData(data, steps) {
-  const interpolatedData = [];
+    joystickVertical.style.left =
+        `${scaledX}px`;  // 50 is the initial left/top value
+    joystickVertical.style.top = `${scaledY}px`;
 
-  for (let i = 0; i < data.length - 1; i++) {
-    const start = data[i];
-    const end = data[i + 1];
+    joystickHorizontal.style.left = `${scaledRoll}px`;
+    joystickHorizontal.style.top = `${scaledPitch}px`;
 
-    for (let j = 0; j < steps; j++) {
-      const t = j / steps;
-      const interpolatedControl = {
-        roll: start.roll + t * (end.roll - start.roll),
-        pitch: start.pitch + t * (end.pitch - start.pitch),
-        yaw: start.yaw + t * (end.yaw - start.yaw),
-        throttle: start.throttle + t * (end.throttle - start.throttle)
-      };
+    var data = JSON.parse(event.data);
 
-      interpolatedData.push(interpolatedControl);
+    // Update the control object with the new pitch and yaw values
+    droneCameracontrol.pitch = data.pitch;
+    droneCameracontrol.yaw = data.yaw;
+
+    if (data.leftSwitch == -1) {
+      bombDropped = true;
+      bombAnimation = true;
+    }
+    // console.log(data.gear);
+
+
+    if (data.gear > 10 && data.gear < 20) {
+      droneView = true;  // Toggle the drone view
+      bottomView =
+          false;  // If drone view is active, bottom view must be deactivated
+    } else if (data.gear > 20 && data.gear < 50) {
+      bottomView = true;  // Toggle the bottom view
+      droneView =
+          false;  // If bottom view is active, drone view must be deactivated
+    } else if (data.gear > 50 && data.gear < 70) {
+      droneView = false;
+      bottomView = false;
     }
   }
 
-  return interpolatedData;
-}
+
+
+  //
+  //
+  // import the fs module at the beginning of your file
+
+  // read the JSON file every second
+  var controlIndex = 0;  // Keep track of which control we're on
+  var targetPosition = new THREE.Vector3();  // Declare it outside the interval
+                                             // to avoid re-declarations
+  var lerpFactor = 0.05;     // Adjust this value as needed for smoothness
+  var interpolatedControls;  // Will hold the interpolated controls
+
+  // Function to interpolate control data
+  function interpolateData(data, steps) {
+    const interpolatedData = [];
+
+    for (let i = 0; i < data.length - 1; i++) {
+      const start = data[i];
+      const end = data[i + 1];
+
+      for (let j = 0; j < steps; j++) {
+        const t = j / steps;
+        const interpolatedControl = {
+          roll: start.roll + t * (end.roll - start.roll),
+          pitch: start.pitch + t * (end.pitch - start.pitch),
+          yaw: start.yaw + t * (end.yaw - start.yaw),
+          throttle: start.throttle + t * (end.throttle - start.throttle)
+        };
+
+        interpolatedData.push(interpolatedControl);
+      }
+    }
+
+    return interpolatedData;
+  }
 
 // Fetch the controls and interpolate them
 fetch('/controls.json')
@@ -327,14 +362,14 @@ window.addEventListener('keydown', function(event) {
 
 var droneCameracontrol = { pitch: 0, yaw: 0 };  // Control object to store pitch and yaw values
 
-ws.onmessage = function(event) {
-  // Assuming the incoming message is in the format: { pitch: 0.1, yaw: 0.2 }
-  var data = JSON.parse(event.data);
+// ws.onmessage = function(event) {
+//   // Assuming the incoming message is in the format: { pitch: 0.1, yaw: 0.2 }
+//   var data = JSON.parse(event.data);
 
-  // Update the control object with the new pitch and yaw values
-  droneCameracontrol.pitch = data.pitch;
-  droneCameracontrol.yaw = data.yaw;
-};
+//   // Update the control object with the new pitch and yaw values
+//   droneCameracontrol.pitch = data.pitch;
+//   droneCameracontrol.yaw = data.yaw;
+// };
 
 window.addEventListener('keydown', function(event) {
   if (event.key === 'V' || event.key === 'v') {
@@ -372,9 +407,6 @@ loader.load(
     });
 
 
-var bombDropped = false;
-var bombAnimation = false
-
 
 window.addEventListener('keydown', function(event) {
   // If key pressed is 'B' or 'b'
@@ -390,7 +422,8 @@ var animate = function() {
   requestAnimationFrame(animate);
 
 
-  // Depending on the value of droneView and bottomView, set the camera to render the scene
+  // // Depending on the value of droneView and bottomView, set the camera to
+  // render the scene
   var activeCamera;
   if (droneView) {
     activeCamera = droneCamera;
@@ -402,15 +435,30 @@ var animate = function() {
 
   // Position the droneCamera relative to the drone's position
   if (droneView) {
+    // Copy drone's position to camera's position
     droneCamera.position.copy(drone.position);
     droneCamera.position.y -= 0.2;  // Position camera above the drone
     droneCamera.position.z += 0.5;  // Position camera at the back of the drone
-    droneCamera.lookAt(drone.position.x, drone.position.y+1, drone.position.z+5);
+
+    // Make camera look at a certain point from the drone's position
+    droneCamera.lookAt(
+        drone.position.x, drone.position.y + 1, drone.position.z + 5);
+
+    // Sync camera rotation with the drone's rotation
+    droneCamera.rotation.copy(drone.rotation);
+
+    // Apply the pitch (rotation around x-axis) and yaw (rotation around y-axis)
+    // control inputs
+    // droneCamera.rotation.x += droneCameracontrol.roll;
+    // droneCamera.rotation.y += droneCameracontrol.pitch;
+
   } else if (bottomView) {
     droneCameraTwo.position.copy(drone.position);
     droneCameraTwo.position.y -= 0.2;  // Position camera above the drone
-    droneCameraTwo.position.z -= 0.1;  // Position camera at the back of the drone
-    droneCameraTwo.lookAt(new THREE.Vector3(drone.position.x, drone.position.y -5, drone.position.z));  // Camera looks at a point beneath the drone
+    droneCameraTwo.position.z -= 0.1;  // Position camera at the back of the
+    droneCameraTwo.lookAt(new THREE.Vector3(
+        drone.position.x, drone.position.y - 5,
+        drone.position.z));  // Camera looks at a point
   } else {
     camera.lookAt(drone.position);
   }
@@ -435,7 +483,7 @@ var animate = function() {
     bomb.position.z -= 0.1;
   }
 
-  
+
 
   if (bombDropped) {
     bomb.position.y -= 0.1;  // Change this value to control the speed of the bomb

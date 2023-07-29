@@ -22,8 +22,14 @@ app.ws('/', function(ws, req) {
         console.log(roll, pitch, yaw, throttle, leftSwitch, gear)
         // console.log(data)
 
-        ws.send(JSON.stringify(
-            {roll: roll, pitch: pitch, yaw: yaw, throttle: throttle}))
+        ws.send(JSON.stringify({
+          roll: roll,
+          pitch: pitch,
+          yaw: yaw,
+          throttle: throttle,
+          leftSwitch: leftSwitch,
+          gear: gear
+        }))
       })
 
       hidDevice.on('error', function(error) {
