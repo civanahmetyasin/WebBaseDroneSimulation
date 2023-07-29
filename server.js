@@ -15,12 +15,15 @@ app.ws('/', function(ws, req) {
       hidDevice.on('data', function(data) {
         var roll = data.readInt8(0)
         var pitch = data.readInt8(1)
-        var yaw = data.readInt8(5)
         var throttle = data.readInt8(2)
-        console.log(roll, pitch, yaw, throttle)
+        var leftSwitch = data.readInt8(3)
+        var gear = data.readInt8(4)
+        var yaw = data.readInt8(5)
+        console.log(roll, pitch, yaw, throttle, leftSwitch, gear)
         // console.log(data)
 
-        ws.send(JSON.stringify({ roll: roll, pitch: pitch, yaw: yaw, throttle: throttle }))
+        ws.send(JSON.stringify(
+            {roll: roll, pitch: pitch, yaw: yaw, throttle: throttle}))
       })
 
       hidDevice.on('error', function(error) {
