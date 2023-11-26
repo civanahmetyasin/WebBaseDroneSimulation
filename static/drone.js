@@ -6,6 +6,8 @@ import * as THREE from 'https://threejsfundamentals.org/threejs/resources/threej
 import {GLTFLoader} from 'https://threejsfundamentals.org/threejs/resources/threejs/r127/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'https://threejsfundamentals.org/threejs/resources/threejs/r127/examples/jsm/loaders/DRACOLoader.js';
 import {OrbitControls} from 'https://threejsfundamentals.org/threejs/resources/threejs/r127/examples/jsm/controls/OrbitControls.js';
+import { RGBELoader } from 'https://threejsfundamentals.org/threejs/resources/threejs/r127/examples/jsm/loaders/RGBELoader.js';
+
 var ws = new WebSocket('ws://localhost:8080');
 
 var scene = new THREE.Scene();
@@ -18,6 +20,13 @@ document.body.appendChild(renderer.domElement);
 var mixer;
 
 // gltf loader with draco decoder
+const rgbeLoader = new RGBELoader();
+rgbeLoader.load('/models/cloud_layers_2k.hdr', function (texture) {
+  texture.mapping = THREE.EquirectangularReflectionMapping;
+  scene.environment = texture;
+});
+
+
 var drone_two;
 var loader = new GLTFLoader();
 loader.setDRACOLoader(new DRACOLoader().setDecoderPath('https://www.gstatic.com/draco/v1/decoders/'));
