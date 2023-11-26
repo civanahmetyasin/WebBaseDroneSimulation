@@ -183,18 +183,20 @@ loader.load(
       drone.position.y = 0;
     }
 
+    var scaledRoll = scale(roll, Math.PI / 4, 0, -Math.PI / 4, 97, 60, -2);
+    var scaledPitch = scale(pitch, Math.PI / 4, 0, -Math.PI / 4, 20, 60, 101);
 
+    var scaledYaw = scale(yaw, Math.PI, 0, -Math.PI, 0, 60, 120);
+    var scaledThrottle = scale(desiredAltitude, 1, 0, -1, 0, 60, 120);
 
-    // Update joysticks
-    var joystickMaxMove =
-        50;  // Maximum pixel distance the joystick can move from the center
-    var scaledRoll =
-        scale(roll, -Math.PI, Math.PI, -joystickMaxMove, joystickMaxMove);
-    var scaledPitch =
-        scale(pitch, -Math.PI, Math.PI, -joystickMaxMove, joystickMaxMove);
+    joystickHorizontal.style.left = `${scaledRoll}px`;
+    joystickHorizontal.style.top = `${scaledPitch}px`;
 
-    joystickHorizontal.style.left = `50 +${scaledRoll}px`;
-    joystickHorizontal.style.top = `50 +${scaledPitch}px`;
+    joystickVertical.style.left = `${scaledYaw}px`;
+    joystickVertical.style.top = `${scaledThrottle}px`;
+
+    console.log(scaledRoll);
+    console.log(scaledPitch);
 
     if (data.leftSwitch == -1) {
       bombDropped = true;
