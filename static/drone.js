@@ -181,7 +181,7 @@ loader.load(
     drone.position.add(right.multiplyScalar(rollSpeed));
     drone.position.add(up.multiplyScalar(throttleSpeed));
     if (drone.position.y < 0) {
-      drone.position.y = 0;
+      drone.position.copy(new THREE.Vector3(0, 0, 0));
     }
 
     var scaledRoll = scale(roll, Math.PI / 4, 0, -Math.PI / 4, 97, 60, -2);
