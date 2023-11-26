@@ -191,9 +191,9 @@ loader.load(
     up.applyQuaternion(quaternion);
 
 
-    var pitchSpeed = pitch * 0.1;
-    var rollSpeed = roll * 0.1;
-    var throttleSpeed = desiredAltitude * 0.1;
+    var pitchSpeed = pitch * 0.5;
+    var rollSpeed = roll * 0.5;
+    var throttleSpeed = desiredAltitude * 0.5;
 
 
     drone.position.add(forward.multiplyScalar(pitchSpeed));
@@ -467,10 +467,9 @@ var animate = function() {
   }
 
   if (bomb.position.y == 0 && bombAnimation) {
-    mixerbomb.update(deltaTime*drone.position.y*0.5);
-  } else {
-    mixerbomb.update(0);
+    mixerbomb.update(deltaTime * drone.position.y * 0.5);
   }
+
   renderer.render(scene, activeCamera);
   updateInfo();
 };
