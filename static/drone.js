@@ -16,7 +16,6 @@ var renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 var mixer;
-var mixer_two;
 
 // gltf loader with draco decoder
 var drone_two;
@@ -43,7 +42,6 @@ loader.load(
       mixer = new THREE.AnimationMixer(drone);
       gltf.animations.forEach((clip) => {
         mixer.clipAction(clip).play();
-        mixer_two.clipAction(clip).play();
       });
     },
     undefined,
@@ -366,8 +364,6 @@ var animate = function() {
   requestAnimationFrame(animate);
 
 
-  // // Depending on the value of droneView and bottomView, set the camera to
-  // render the scene
   var activeCamera;
   if (droneView) {
     activeCamera = droneCamera;
@@ -427,7 +423,7 @@ var animate = function() {
 
   var deltaTime = clock.getDelta();
   if (mixer) {
-    mixer.update(deltaTime);
+    mixer.update(deltaTime * drone.position.y * 10);
   }
 
   var targetPosition = new THREE.Vector3();
@@ -454,6 +450,8 @@ var animate = function() {
 
   if (bomb.position.y == 0 && bombAnimation) {
     mixerbomb.update(deltaTime * drone.position.y * 0.5);
+  } else {
+    mixerbomb.update(0);
   }
 
   renderer.render(scene, activeCamera);
