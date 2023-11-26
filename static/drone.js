@@ -234,14 +234,23 @@ loader.load(
     }
 
     if (data.gear > 10 && data.gear < 20) {
-      droneView = true;  // Toggle the drone view
-      bottomView =
-          false;  // If drone view is active, bottom view must be deactivated
+      droneView = true;
+      bottomView = false;
+      fix_camera = false;
     } else if (data.gear > 20 && data.gear < 50) {
-      bottomView = true;  // Toggle the bottom view
-      droneView =
-          false;  // If bottom view is active, drone view must be deactivated
+      bottomView = true;
+      droneView = false;
+      fix_camera = false;
     } else if (data.gear > 50 && data.gear < 70) {
+      droneView = false;
+      bottomView = false;
+      fix_camera = true;
+    } else if (data.gear > 70 && data.gear < 90) {
+      fix_camera = true;
+      droneView = false;
+      bottomView = false;
+    } else if (data.gear > 90 && data.gear < 110) {
+      fix_camera = false;
       droneView = false;
       bottomView = false;
     }
@@ -323,6 +332,7 @@ var droneCameraTwo = droneCamera.clone();
 
 var droneView = false;  // By default, the view is set to the main camera
 var bottomView = false;  // View from the bottom of the drone
+var fix_camera = false;  // View from the bottom of the drone
 
 window.addEventListener('keydown', function(event) {
   // If key pressed is 'C' or 'c'
@@ -443,6 +453,9 @@ var animate = function() {
 
     // Kameranın quaternionunu ayarla
     droneCameraTwo.quaternion.copy(cameraQuaternionBomb);
+  } else if (fix_camera) {
+    camera.position.set(0, 5, -10);
+    camera.lookAt(drone.position);
   } else {
     camera.lookAt(drone.position);
   }
