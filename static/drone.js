@@ -67,6 +67,10 @@ var euler = new THREE.Euler(0, 0, 0, 'YXZ');  // 'YXZ' dönüş sırasını beli
 var quaternion = new THREE.Quaternion();
 var pitch = 0;
 var desiredAltitude = 0;
+
+var drone_at_ground_last_x = 0;
+var drone_at_ground_last_z = 0;
+
 loader.load(
     '/models/scan.gltf',
     function(gltf) {
@@ -180,9 +184,31 @@ loader.load(
     drone.position.add(forward.multiplyScalar(pitchSpeed));
     drone.position.add(right.multiplyScalar(rollSpeed));
     drone.position.add(up.multiplyScalar(throttleSpeed));
+
     if (drone.position.y < 0) {
-      drone.position.copy(new THREE.Vector3(0, 0, 0));
+      drone.position.y = 0;
+      drone.position.x = drone_at_ground_last_x;
+      drone.position.z = drone_at_ground_last_z;
+
+      drone.rotation.x = 0;
+      drone.rotation.z = 0;
+
+      drone.traverse(function(child) {
+        if (child.isMesh) {
+          child.material.color.setHex(0xff0000, 1);
+        }
+      });
+    } else {
+      drone_at_ground_last_x = drone.position.x;
+      drone_at_ground_last_z = drone.position.z;
+
+      drone.traverse(function(child) {
+        if (child.isMesh) {
+          child.material.color.setHex(0xffffff, 1);
+        }
+      });
     }
+
 
     var scaledRoll = scale(roll, Math.PI / 4, 0, -Math.PI / 4, 97, 60, -2);
     var scaledPitch = scale(pitch, Math.PI / 4, 0, -Math.PI / 4, 20, 60, 101);
