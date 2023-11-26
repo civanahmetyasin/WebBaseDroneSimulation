@@ -143,7 +143,7 @@ loader.load(
     }
 
     // Ölçeklendirme işlemleri
-    var roll = scale(data.roll, 19, 134, 241, Math.PI / 4, 0, -Math.PI / 4);
+    var roll = scale(data.roll, 241, 134, 19, Math.PI / 4, 0, -Math.PI / 4);
     pitch = scale(data.pitch, 17, 134, 243, Math.PI / 4, 0, -Math.PI / 4);
     var yaw = scale(data.yaw, 19, 134, 244, Math.PI, 0, -Math.PI);
     var desiredAltitude = scale(data.throttle, 20, 134, 244, 1, 0, -1);
@@ -181,6 +181,9 @@ loader.load(
     drone.position.add(forward.multiplyScalar(pitchSpeed));
     drone.position.add(right.multiplyScalar(rollSpeed));
     drone.position.add(up.multiplyScalar(throttleSpeed));
+    if (drone.position.y < 0) {
+      drone.position.y = 0;
+    }
 
 
 
@@ -192,8 +195,8 @@ loader.load(
     var scaledPitch =
         scale(pitch, -Math.PI, Math.PI, -joystickMaxMove, joystickMaxMove);
 
-    joystickHorizontal.style.left = `${scaledRoll}px`;
-    joystickHorizontal.style.top = `${scaledPitch}px`;
+    joystickHorizontal.style.left = `50 +${scaledRoll}px`;
+    joystickHorizontal.style.top = `50 +${scaledPitch}px`;
 
     if (data.leftSwitch == -1) {
       bombDropped = true;
@@ -424,7 +427,7 @@ var animate = function() {
 
   var deltaTime = clock.getDelta();
   if (mixer) {
-    mixer.update(deltaTime * drone.position.y * 5);
+    mixer.update(deltaTime);
   }
 
   var targetPosition = new THREE.Vector3();
