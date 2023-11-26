@@ -33,33 +33,18 @@ loader.load(
       drone.scale.set(5,5,5);
       drone.traverse(function(child) {
         if (child.isMesh) {
-            child.castShadow = true;
-            child.receiveShadow = true;
-            child.material.color.setHex(0xffffff, 1);
-
+          child.castShadow = true;
+          child.receiveShadow = true;
+          child.material.color.setHex(0xffffff, 1);
         }
       });
-      // drone_two = drone.clone();
-      // drone_two.position.set(10, 0, 0);
-      // scene.add(drone_two);
 
       scene.add(drone);
-
-        // Create an AnimationMixer instance and set it to the drone
-        mixer = new THREE.AnimationMixer(drone);
-        // mixer_two = new THREE.AnimationMixer(drone_two);
-
-        // Get all animations from the glTF model
-        gltf.animations.forEach((clip) => {
-            // Create an AnimationAction for each animation and play it
-            mixer.clipAction(clip).play();
-            mixer_two.clipAction(clip).play();
-        });
-
-        
-      
-
-
+      mixer = new THREE.AnimationMixer(drone);
+      gltf.animations.forEach((clip) => {
+        mixer.clipAction(clip).play();
+        mixer_two.clipAction(clip).play();
+      });
     },
     undefined,
     function(error) {
@@ -92,15 +77,14 @@ loader.load(
       scan.position.z = 20;
       scan.rotation.y = Math.PI/2;
       scene.add(scan);
-      //change color of scan to grey
+
       scan.traverse(function(child) {
         if (child.isMesh) {
           child.material.color.setHex(0xaaaaaa, 0.5);
           child.castShadow = true;
           child.receiveShadow = true;
         }
-      }
-      );
+      });
 
       scan_two = scan.clone();
       scan_two.position.set(10, 0, 30); 
@@ -157,8 +141,6 @@ loader.load(
     if (data.throttle < 0) {
       data.throttle += 256;
     }
-
-
 
     // Ölçeklendirme işlemleri
     var roll = scale(data.roll, 19, 134, 241, Math.PI / 4, 0, -Math.PI / 4);
@@ -422,7 +404,7 @@ var animate = function() {
   } else if (bottomView) {
     droneCameraTwo.position.copy(drone.position);
     droneCameraTwo.position.y -= 0.2;  // Position camera above the drone
-    droneCameraTwo.position.z -= 0.1;  // Position camera at the back of the
+    droneCameraTwo.position.z -= 0.2;  // Position camera at the back of the
     // Kameranın rotasyonunu ayarla
     var cameraEulerBomb = new THREE.Euler(0, 0, 0, 'YXZ');
     var cameraQuaternionBomb = new THREE.Quaternion();
@@ -457,6 +439,7 @@ var animate = function() {
     bomb.position.copy(drone.position);
     bomb.position.y -= 0.4;
     bomb.position.z -= 0.1;
+    bomb.quaternion.copy(drone.quaternion);
   }
 
   if (bombDropped) {
