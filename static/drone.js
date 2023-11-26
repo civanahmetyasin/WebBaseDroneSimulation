@@ -114,8 +114,8 @@ loader.load(
   scene.background = new THREE.Color(0xffffff);
   scene.add(new THREE.GridHelper(1000, 100, 0x000000, 0x000000));
   scene.add(new THREE.AxesHelper(1000));
-  scene.fog = new THREE.Fog(0xffffff, 40, 100);
-  
+  scene.fog = new THREE.Fog(0xffffff, 60, 100);
+
   camera.position.set(0, 5, -10);
   var controls = new OrbitControls(camera, renderer.domElement);
   controls.update();
