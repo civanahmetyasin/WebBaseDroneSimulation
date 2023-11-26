@@ -66,6 +66,7 @@ var camera_pitch = 0;
 var euler = new THREE.Euler(0, 0, 0, 'YXZ');  // 'YXZ' dönüş sırasını belirler
 var quaternion = new THREE.Quaternion();
 var pitch = 0;
+var desiredAltitude = 0;
 loader.load(
     '/models/scan.gltf',
     function(gltf) {
@@ -144,7 +145,7 @@ loader.load(
     var roll = scale(data.roll, 241, 134, 19, Math.PI / 4, 0, -Math.PI / 4);
     pitch = scale(data.pitch, 17, 134, 243, Math.PI / 4, 0, -Math.PI / 4);
     var yaw = scale(data.yaw, 19, 134, 244, Math.PI, 0, -Math.PI);
-    var desiredAltitude = scale(data.throttle, 20, 134, 244, 1, 0, -1);
+    desiredAltitude = scale(data.throttle, 20, 134, 244, 1, 0, -1);
 
     // Yaw değerini last_yaw'a ekleyerek güncelle
     last_yaw += yaw * 0.01;
@@ -194,9 +195,6 @@ loader.load(
 
     joystickVertical.style.left = `${scaledYaw}px`;
     joystickVertical.style.top = `${scaledThrottle}px`;
-
-    console.log(scaledRoll);
-    console.log(scaledPitch);
 
     if (data.leftSwitch == -1) {
       bombDropped = true;
@@ -425,7 +423,7 @@ var animate = function() {
 
   var deltaTime = clock.getDelta();
   if (mixer) {
-    mixer.update(deltaTime * drone.position.y * 10);
+    mixer.update(scale(desiredAltitude, -1, 0, 1, 0, 0.5, 5));
   }
 
   var targetPosition = new THREE.Vector3();
