@@ -50,7 +50,6 @@ var mixer;
 const rgbeLoader = new RGBELoader();
 rgbeLoader.load('/models/cloud_layers_2k.hdr', function (texture) {
   texture.mapping = THREE.EquirectangularReflectionMapping;
-  scene.environment = texture;
 });
 
 var drone_two;
