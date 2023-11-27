@@ -7,10 +7,37 @@ import {GLTFLoader} from 'https://threejsfundamentals.org/threejs/resources/thre
 import { DRACOLoader } from 'https://threejsfundamentals.org/threejs/resources/threejs/r127/examples/jsm/loaders/DRACOLoader.js';
 import {OrbitControls} from 'https://threejsfundamentals.org/threejs/resources/threejs/r127/examples/jsm/controls/OrbitControls.js';
 import { RGBELoader } from 'https://threejsfundamentals.org/threejs/resources/threejs/r127/examples/jsm/loaders/RGBELoader.js';
-
+import { Sky } from 'https://threejsfundamentals.org/threejs/resources/threejs/r127/examples/jsm/objects/Sky.js';
 var ws = new WebSocket('ws://localhost:8080');
 
 var scene = new THREE.Scene();
+// Setup Sky
+const sky = new Sky();
+sky.scale.setScalar(10000);
+scene.add(sky);
+
+const skyUniforms = sky.material.uniforms;
+
+skyUniforms['turbidity'].value = 5;
+skyUniforms['rayleigh'].value = 2;
+skyUniforms['mieCoefficient'].value = 0.005;
+skyUniforms['mieDirectionalG'].value = 0.5;
+
+// Set up the sun position
+const sun = new THREE.Vector3();
+
+function updateSunPosition() {
+    const theta = Math.PI * (0.45 - 0.5);
+    const phi = 2 * Math.PI * (0.25 - 0.5);
+
+    sun.x = Math.cos(phi);
+    sun.y = Math.sin(phi) * Math.sin(theta);
+    sun.z = Math.sin(phi) * Math.cos(theta);
+
+    sky.material.uniforms['sunPosition'].value.copy(sun);
+}
+
+updateSunPosition();
 var camera = new THREE.PerspectiveCamera(
     75, window.innerWidth / window.innerHeight, 0.1, 1000);
 var renderer = new THREE.WebGLRenderer();
