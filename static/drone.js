@@ -148,7 +148,7 @@ loader.load(
   scene.add(light, pointLight);
   
   scene.background = new THREE.Color(0xffffff);
-  scene.add(new THREE.GridHelper(1000, 100, 0x000000, 0x000000));
+  //scene.add(new THREE.GridHelper(1000, 100, 0x000000, 0x000000));
   scene.add(new THREE.AxesHelper(1000));
   scene.fog = new THREE.Fog(0xffffff, 60, 100);
 
