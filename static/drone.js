@@ -114,8 +114,8 @@ texture.repeat.set(5, 5);
 
 loader.load('/models/mount.glb', function(gltf) {
   var mount = gltf.scene;
-  mount.position.y = -63;
-  mount.position.x = 0;
+  mount.position.y = 5;
+  mount.position.x = -120;
   mount.position.z = 0;
   mount.scale.set(50,50,50);
   mount.traverse(function(child) {
