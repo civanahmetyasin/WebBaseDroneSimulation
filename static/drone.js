@@ -53,7 +53,6 @@ rgbeLoader.load('/models/cloud_layers_2k.hdr', function (texture) {
   scene.environment = texture;
 });
 
-
 var drone_two;
 var loader = new GLTFLoader();
 loader.setDRACOLoader(new DRACOLoader().setDecoderPath('https://www.gstatic.com/draco/v1/decoders/'));
@@ -106,7 +105,41 @@ var desiredAltitude = 0;
 
 var drone_at_ground_last_x = 0;
 var drone_at_ground_last_z = 0;
+// add texture
+var texture = new THREE.TextureLoader().load('/models/ground.jpg');
+texture.wrapS = THREE.RepeatWrapping;
+texture.wrapT = THREE.RepeatWrapping;
+texture.castShadow = false;
+texture.repeat.set(5, 5);
 
+loader.load('/models/mount.glb', function(gltf) {
+  var mount = gltf.scene;
+  mount.position.y = -63;
+  mount.position.x = 0;
+  mount.position.z = 0;
+  mount.scale.set(50,50,50);
+  mount.traverse(function(child) {
+    if (child.isMesh) {
+      child.material.map = texture;
+      child.castShadow = false;
+      child.receiveShadow = false;
+      child.material.color.setHex(0xffffff, 1);
+      child.material.side = THREE.DoubleSide;
+  
+    }
+
+  });
+
+  scene.add(mount);
+
+
+},
+undefined,
+
+function(error) {
+  console.error(error);
+}
+);
 loader.load(
     '/models/scan.gltf',
     function(gltf) {
@@ -115,7 +148,7 @@ loader.load(
       scan.position.x = -20;
       scan.position.z = 20;
       scan.rotation.y = Math.PI/2;
-      scene.add(scan);
+      //scene.add(scan);
 
       scan.traverse(function(child) {
         if (child.isMesh) {
@@ -127,12 +160,12 @@ loader.load(
 
       scan_two = scan.clone();
       scan_two.position.set(10, 0, 30); 
-      scene.add(scan_two);
+      //scene.add(scan_two);
 
       scan_three = scan.clone();
       scan_three.position.set(-18, 0, 60);
       scan_three.scale.set(0.7, 0.7, 0.7);
-      scene.add(scan_three);
+      //scene.add(scan_three);
         
 
     },
