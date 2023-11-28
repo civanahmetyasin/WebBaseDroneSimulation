@@ -57,7 +57,7 @@ var loader = new GLTFLoader();
 loader.setDRACOLoader(new DRACOLoader().setDecoderPath('https://www.gstatic.com/draco/v1/decoders/'));
 var drone;
 loader.load(
-    '/models/Drone.glb',
+    '/models/drone_2.glb',
     function(gltf) {
       drone = gltf.scene;
       drone.position.y = 0;
@@ -68,7 +68,7 @@ loader.load(
         if (child.isMesh) {
           child.castShadow = true;
           child.receiveShadow = true;
-          child.material.color.setHex(0xffffff, 1);
+          //child.material.color.setHex(0xffffff, 1);
         }
       });
 
