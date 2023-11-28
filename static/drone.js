@@ -102,6 +102,11 @@ var quaternion = new THREE.Quaternion();
 var pitch = 0;
 var desiredAltitude = 0;
 
+// Geçmiş hız değerlerini saklamak için değişkenler
+var lastPitchSpeed = 0;
+var lastRollSpeed = 0;
+var lastThrottleSpeed = 0;
+
 var drone_at_ground_last_x = 0;
 var drone_at_ground_last_z = 0;
 // add texture
@@ -244,14 +249,18 @@ loader.load(
     up.applyQuaternion(quaternion);
 
 
-    var pitchSpeed = pitch * 0.5;
-    var rollSpeed = roll * 0.5;
-    var throttleSpeed = desiredAltitude * 0.5;
+    var pitchSpeed = lastPitchSpeed * 0.99 + pitch * 0.01;
+    var rollSpeed = lastRollSpeed * 0.99 + roll * 0.01;
+    var throttleSpeed = lastThrottleSpeed * 0.8 + desiredAltitude * 0.2;
 
-
+    // Güncellenmiş hız değerleriyle drone pozisyonunu güncelle
     drone.position.add(forward.multiplyScalar(pitchSpeed));
     drone.position.add(right.multiplyScalar(rollSpeed));
     drone.position.add(up.multiplyScalar(throttleSpeed));
+
+    lastPitchSpeed = pitchSpeed;
+    lastRollSpeed = rollSpeed;
+    lastThrottleSpeed = throttleSpeed;
 
     if (drone.position.y < 0) {
       drone.position.y = 0;
