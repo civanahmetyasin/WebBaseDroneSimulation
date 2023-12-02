@@ -57,7 +57,7 @@ var loader = new GLTFLoader();
 loader.setDRACOLoader(new DRACOLoader().setDecoderPath('https://www.gstatic.com/draco/v1/decoders/'));
 var drone;
 loader.load(
-    '/models/drone_2.glb',
+    '/models/Drone.glb',
     function(gltf) {
       drone = gltf.scene;
       drone.position.y = 0;
