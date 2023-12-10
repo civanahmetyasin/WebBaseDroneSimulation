@@ -23,8 +23,8 @@ To run this project locally, follow these steps:
 
 1. Clone the repository to your local machine.
 2. Ensure you have Node.js installed.
-3. Install the dependencies: npm install node-hid ws express express-ws
-4. Start the server: node server.js
+3. Install the dependencies: `npm install node-hid ws express express-ws`
+4. Start the server: `node server.js`
 5. Open your web browser and navigate to `http://localhost:8080/`.
 
 ## Code Overview
